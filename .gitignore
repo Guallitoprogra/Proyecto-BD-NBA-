@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Los datos originales son grandes y se distribuyen por Canvas.
+data/raw/*
+!data/raw/.gitkeep
