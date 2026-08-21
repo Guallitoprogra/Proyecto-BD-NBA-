@@ -18,6 +18,5 @@ Proyecto grupal de CC3088 Base de Datos 1. Construiremos una base de datos Postg
 
 - [Inventario de datos](docs/data_inventory.md)
 - [Decisiones y calidad](docs/data_quality.md)
-- [Plan de trabajo](docs/team_plan.md)
-- [Modelo ER](diagrams/modelo_er.md)
+
 
