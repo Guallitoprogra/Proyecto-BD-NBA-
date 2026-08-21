@@ -121,3 +121,22 @@ CREATE TABLE IF NOT EXISTS draft_pick (
 );
 
 COMMIT;
+
+CREATE TABLE IF NOT EXISTS player_season_stat (
+    player_id           BIGINT NOT NULL,
+    season              VARCHAR(7) NOT NULL,
+    team_id             BIGINT NOT NULL,
+    player_name         TEXT NOT NULL,
+    team_abbreviation   VARCHAR(5),
+    games_played        SMALLINT,
+    points              NUMERIC(8,3),
+    assists             NUMERIC(8,3),
+    rebounds            NUMERIC(8,3),
+    plus_minus          NUMERIC(8,3),
+    loaded_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (player_id, season, team_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_player_season_stat_team
+    ON player_season_stat(season, team_id);
