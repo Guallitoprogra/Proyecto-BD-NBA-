@@ -249,18 +249,19 @@ ORDER BY season_start_year, win_rate DESC;
 -- Pregunta propia B. Eficiencia salarial aproximada en 2020/21.
 
 WITH results AS (
-    SELECT home_team_name AS team_name, (home_win_loss = 'W')::int AS win
+    SELECT home_team_id AS team_id, (home_win_loss = 'W')::int AS win
     FROM game WHERE season_start_year = 2020
     UNION ALL
-    SELECT away_team_name, (away_win_loss = 'W')::int
+    SELECT away_team_id, (away_win_loss = 'W')::int
     FROM game WHERE season_start_year = 2020
 ), wins AS (
-    SELECT team_name, SUM(win) AS wins
-    FROM results GROUP BY team_name
+    SELECT team_id, SUM(win) AS wins
+    FROM results GROUP BY team_id
 )
-SELECT w.team_name, w.wins, ts.salary_2020_21,
+SELECT t.full_name AS team_name, w.wins, ts.salary_2020_21,
        ROUND(w.wins / NULLIF(ts.salary_2020_21 / 1000000, 0), 3)
            AS wins_per_million
 FROM wins w
-JOIN team_salary ts ON lower(ts.team_name) = lower(w.team_name)
+JOIN team t ON t.team_id = w.team_id
+JOIN team_salary ts ON lower(ts.team_name) = lower(t.full_name)
 ORDER BY wins_per_million DESC NULLS LAST;
