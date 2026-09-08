@@ -10,11 +10,10 @@ JOIN player_attribute pa
     ON pa.player_id = p.player_id
 WHERE p.is_active = TRUE
   AND pa.height ~ '^[0-9]+(\.[0-9]+)?$'
-ORDER BY pa.height::NUMERIC DESC, p.full_name
+ORDER BY pa.height::NUMERIC DESC
 LIMIT 1;
 
 -- 1B. Jugador activo más bajo
-
 SELECT
     p.player_id,
     p.full_name,
@@ -25,7 +24,7 @@ JOIN player_attribute pa
     ON pa.player_id = p.player_id
 WHERE p.is_active = TRUE
   AND pa.height ~ '^[0-9]+(\.[0-9]+)?$'
-ORDER BY pa.height::NUMERIC ASC, p.full_name
+ORDER BY pa.height::NUMERIC ASC
 LIMIT 1;
 
 -- 2. Promedio de puntos anotados y recibidos por equipo y temporada.
@@ -61,27 +60,46 @@ GROUP BY o.official_id, o.first_name, o.last_name
 ORDER BY away_losses DESC, official_name
 LIMIT 5;
 
--- 4. Equipos con mayor nómina y salario individual más alto en 2020-21.
+-- 4. ¿Qué equipos manejan los salarios más altos en la última
+-- temporada disponible y cómo se compara con su jugador mejor pagado?
 
-WITH highest_player_salary AS (
-    SELECT
-        team_name,
-        MAX(salary_value) AS highest_player_salary
+WITH latest_season AS (
+    SELECT MAX(season) AS season
     FROM player_salary
-    WHERE season = '2020-21'
-    GROUP BY team_name
+),
+highest_player_salary AS (
+    SELECT
+        ps.team_name,
+        MAX(ps.salary_value) AS highest_player_salary
+    FROM player_salary ps
+    JOIN latest_season ls
+        ON ps.season = ls.season
+    GROUP BY ps.team_name
 )
 
 SELECT
+    ls.season,
     ts.team_name,
-    ts.salary_2020_21 AS total_team_salary,
-    h.highest_player_salary
+
+    CASE ls.season
+        WHEN '2020-21' THEN ts.salary_2020_21
+        WHEN '2021-22' THEN ts.salary_2021_22
+        WHEN '2022-23' THEN ts.salary_2022_23
+        WHEN '2023-24' THEN ts.salary_2023_24
+        WHEN '2024-25' THEN ts.salary_2024_25
+        WHEN '2025-26' THEN ts.salary_2025_26
+    END AS total_team_salary,
+
+    hps.highest_player_salary
+
 FROM team_salary ts
+CROSS JOIN latest_season ls
 
-LEFT JOIN highest_player_salary h
-    ON LOWER(ts.team_name) = LOWER(h.team_name)
+LEFT JOIN highest_player_salary hps
+    ON LOWER(TRIM(hps.team_name))
+     = LOWER(TRIM(ts.team_name))
 
-ORDER BY ts.salary_2020_21 DESC;
+ORDER BY total_team_salary DESC NULLS LAST;
 
 -- 5A. Temporada(s) con mayor cantidad de partidos.
 
@@ -139,24 +157,28 @@ WHERE position = 1
 ORDER BY season_start_year;
 
 -- 7. Jugador del Draft 2018 con mayor salario
--- usando la información salarial más reciente disponible.
+-- usando la temporada más reciente disponible para cada jugador.
 
 WITH draft_2018_salaries AS (
     SELECT
         d.player_name,
         d.overall_pick,
         d.team_name AS draft_team,
-        ps.team_name,
+        ps.team_name AS salary_team,
         ps.season,
         ps.salary_value,
+
         ROW_NUMBER() OVER (
             PARTITION BY d.player_name
             ORDER BY ps.season DESC
         ) AS rn
+
     FROM draft_pick d
+
     JOIN player_salary ps
         ON LOWER(TRIM(d.player_name))
          = LOWER(TRIM(ps.player_name))
+
     WHERE d.draft_year = 2018
 )
 
@@ -164,12 +186,16 @@ SELECT
     player_name,
     overall_pick,
     draft_team,
-    team_name AS salary_team,
+    salary_team,
     season,
     salary_value
+
 FROM draft_2018_salaries
+
 WHERE rn = 1
+
 ORDER BY salary_value DESC
+
 LIMIT 1;
 
 -- 8. Top 5 de estados con mayor gasto salarial
