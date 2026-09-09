@@ -154,3 +154,133 @@ JOIN team t
     ON t.team_id = tpm.team_id
 GROUP BY t.team_id, t.full_name
 ORDER BY avg_point_margin DESC;
+
+-- ============================================================
+-- D. EFICIENCIA FINANCIERA
+-- Objetivo:
+-- Comparar el rendimiento deportivo con el gasto salarial
+-- para medir qué equipos obtienen más victorias por cada
+-- millón de dólares de nómina.
+-- ============================================================
+
+WITH team_results AS (
+    SELECT
+        home_team_id AS team_id,
+        (home_win_loss = 'W')::int AS win
+    FROM game
+    WHERE season_start_year = 2020
+
+    UNION ALL
+
+    SELECT
+        away_team_id AS team_id,
+        (away_win_loss = 'W')::int AS win
+    FROM game
+    WHERE season_start_year = 2020
+),
+team_performance AS (
+    SELECT
+        team_id,
+        COUNT(*) AS games_played,
+        SUM(win) AS wins,
+        AVG(win::numeric) AS win_rate
+    FROM team_results
+    GROUP BY team_id
+)
+SELECT
+    t.full_name AS team_name,
+    tp.games_played,
+    tp.wins,
+    ROUND(tp.win_rate, 4) AS win_rate,
+    ts.salary_2020_21 AS team_salary,
+    ROUND(
+        tp.wins / NULLIF(ts.salary_2020_21 / 1000000.0, 0),
+        4
+    ) AS wins_per_million
+FROM team_performance tp
+JOIN team t
+    ON t.team_id = tp.team_id
+JOIN team_salary ts
+    ON LOWER(TRIM(ts.team_name)) = LOWER(TRIM(t.full_name))
+WHERE ts.salary_2020_21 IS NOT NULL
+ORDER BY wins_per_million DESC;
+
+-- ============================================================
+-- E. CALIDAD DEL TALENTO - NBA API
+-- Objetivo:
+-- Comparar la calidad del talento de cada equipo utilizando
+-- las estadisticas de jugadores de la temporada 2021-22
+-- obtenidas mediante NBA API.
+-- ============================================================
+
+SELECT
+    t.full_name AS team_name,
+    COUNT(pss.player_id) AS players_analyzed,
+    ROUND(AVG(pss.points), 2) AS avg_points,
+    ROUND(AVG(pss.assists), 2) AS avg_assists,
+    ROUND(AVG(pss.rebounds), 2) AS avg_rebounds,
+    ROUND(AVG(pss.plus_minus), 2) AS avg_plus_minus,
+    ROUND(
+        AVG(pss.points)
+        + AVG(pss.assists)
+        + AVG(pss.rebounds),
+        2
+    ) AS talent_score
+FROM player_season_stat pss
+JOIN team t
+    ON t.team_id = pss.team_id
+WHERE pss.season = '2021-22'
+  AND pss.team_id <> 0
+GROUP BY
+    t.team_id,
+    t.full_name
+ORDER BY talent_score DESC;
+
+-- ============================================================
+-- F. DEPENDENCIA DE UNA ESTRELLA
+-- Objetivo:
+-- Medir cuanto depende cada equipo de su maximo anotador
+-- durante la temporada 2021-22.
+-- Un porcentaje alto indica mayor dependencia de una estrella.
+-- ============================================================
+
+WITH team_scoring AS (
+    SELECT
+        team_id,
+        SUM(points) AS total_player_points,
+        MAX(points) AS top_scorer_points
+    FROM player_season_stat
+    WHERE season = '2021-22'
+      AND team_id <> 0
+      AND points IS NOT NULL
+    GROUP BY team_id
+),
+top_scorer AS (
+    SELECT DISTINCT ON (team_id)
+        team_id,
+        player_name AS top_scorer_name,
+        points AS top_scorer_points
+    FROM player_season_stat
+    WHERE season = '2021-22'
+      AND team_id <> 0
+      AND points IS NOT NULL
+    ORDER BY
+        team_id,
+        points DESC,
+        player_name
+)
+SELECT
+    t.full_name AS team_name,
+    tsr.top_scorer_name,
+    ROUND(ts.top_scorer_points, 2) AS top_scorer_points,
+    ROUND(ts.total_player_points, 2) AS total_player_points,
+    ROUND(
+        (ts.top_scorer_points / NULLIF(ts.total_player_points, 0)) * 100,
+        2
+    ) AS star_dependency_pct
+FROM team_scoring ts
+JOIN top_scorer tsr
+    ON tsr.team_id = ts.team_id
+JOIN team t
+    ON t.team_id = ts.team_id
+ORDER BY star_dependency_pct DESC;
