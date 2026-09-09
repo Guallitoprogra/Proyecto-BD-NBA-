@@ -1,0 +1,756 @@
+{
+  "verified": "2026-09-08",
+  "schema_sha256": "914beb9be1ac8c9e4a49472bdabe72078cb564618f6d0625bcafbda75b299720",
+  "tables": {
+    "draft_pick": {
+      "columns": [
+        {
+          "name": "draft_year",
+          "type": "smallint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "overall_pick",
+          "type": "smallint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "round_number",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "round_pick",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "player_id",
+          "type": "bigint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "player_name",
+          "type": "text",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "team_id",
+          "type": "bigint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "team_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "organization_from",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (draft_year, overall_pick, player_name)"
+        }
+      ]
+    },
+    "game": {
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "character varying(20)",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "season_id",
+          "type": "character varying(20)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "season_start_year",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "game_date",
+          "type": "date",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "home_team_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "home_team_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "home_win_loss",
+          "type": "character(1)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "home_points",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "away_team_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "away_team_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "away_win_loss",
+          "type": "character(1)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "away_points",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "attendance",
+          "type": "integer",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((home_team_id <> away_team_id))"
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (game_id)"
+        }
+      ]
+    },
+    "game_official": {
+      "columns": [
+        {
+          "name": "game_id",
+          "type": "character varying(20)",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "official_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (game_id) REFERENCES game(game_id) ON DELETE CASCADE"
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (official_id) REFERENCES official(official_id)"
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (game_id, official_id)"
+        }
+      ]
+    },
+    "official": {
+      "columns": [
+        {
+          "name": "official_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "jersey_number",
+          "type": "character varying(10)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (official_id)"
+        }
+      ]
+    },
+    "player": {
+      "columns": [
+        {
+          "name": "player_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "full_name",
+          "type": "text",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "not_null": true,
+          "default": "false",
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (player_id)"
+        }
+      ]
+    },
+    "player_attribute": {
+      "columns": [
+        {
+          "name": "player_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "birthdate",
+          "type": "date",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "school",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "country",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "height",
+          "type": "character varying(10)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "weight",
+          "type": "numeric(6,2)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "season_experience",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "position",
+          "type": "character varying(20)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "roster_status",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "current_team_id",
+          "type": "bigint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "current_team_name",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "from_year",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "to_year",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "draft_year",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "draft_round",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "draft_number",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "points",
+          "type": "numeric(8,3)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "assists",
+          "type": "numeric(8,3)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "rebounds",
+          "type": "numeric(8,3)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "all_star_appearances",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "pie",
+          "type": "numeric(10,5)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (player_id) REFERENCES player(player_id)"
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (player_id)"
+        }
+      ]
+    },
+    "player_salary": {
+      "columns": [
+        {
+          "name": "salary_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": "a"
+        },
+        {
+          "name": "season",
+          "type": "character varying(7)",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "team_name",
+          "type": "text",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "player_name",
+          "type": "text",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "player_status",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "is_final_season",
+          "type": "boolean",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "is_waived",
+          "type": "boolean",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "is_on_roster",
+          "type": "boolean",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "contract_detail",
+          "type": "text",
+          "not_null": true,
+          "default": "''::text",
+          "identity": ""
+        },
+        {
+          "name": "salary_value",
+          "type": "numeric(14,2)",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (salary_id)"
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (season, team_name, player_name, contract_detail, salary_value)"
+        }
+      ]
+    },
+    "player_season_stat": {
+      "columns": [
+        {
+          "name": "player_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "season",
+          "type": "character varying(7)",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "team_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "player_name",
+          "type": "text",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "team_abbreviation",
+          "type": "character varying(5)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "games_played",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "points",
+          "type": "numeric(8,3)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "assists",
+          "type": "numeric(8,3)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "rebounds",
+          "type": "numeric(8,3)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "plus_minus",
+          "type": "numeric(8,3)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "loaded_at",
+          "type": "timestamp without time zone",
+          "not_null": true,
+          "default": "CURRENT_TIMESTAMP",
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (player_id, season, team_id)"
+        }
+      ]
+    },
+    "team": {
+      "columns": [
+        {
+          "name": "team_id",
+          "type": "bigint",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "full_name",
+          "type": "text",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "abbreviation",
+          "type": "character varying(5)",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "nickname",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "year_founded",
+          "type": "smallint",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (team_id)"
+        }
+      ]
+    },
+    "team_salary": {
+      "columns": [
+        {
+          "name": "team_name",
+          "type": "text",
+          "not_null": true,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "team_slug",
+          "type": "character varying(5)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "salary_2020_21",
+          "type": "numeric(14,2)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "salary_2021_22",
+          "type": "numeric(14,2)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "salary_2022_23",
+          "type": "numeric(14,2)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "salary_2023_24",
+          "type": "numeric(14,2)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "salary_2024_25",
+          "type": "numeric(14,2)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        },
+        {
+          "name": "salary_2025_26",
+          "type": "numeric(14,2)",
+          "not_null": false,
+          "default": null,
+          "identity": ""
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (team_name)"
+        }
+      ]
+    }
+  }
+}
