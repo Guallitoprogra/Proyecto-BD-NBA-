@@ -15,18 +15,6 @@ Proyecto grupal de CC3088 Base de Datos 1. Construiremos una base de datos Postg
 - Ranking revisado: Utah Jazz, con prueba de sensibilidad de pesos.
 - Problemas de calidad identificados y documentados.
 
-## Documentación
-
-- [Inventario de datos](docs/data_inventory.md)
-- [Decisiones y calidad](docs/data_quality.md)
-- [Proceso de carga](docs/proceso_carga.md)
-- [Modelo ER final (PDF)](output/pdf/modelo_er_final.pdf)
-- [Modelo físico (imagen)](docs/diagrams/modelo_er_final.png)
-- [Relaciones lógicas (imagen)](docs/diagrams/relaciones_logicas.png)
-- [Resultados de ejecución](docs/execution_results.md)
-- [Cierre Persona 1](docs/cierre_persona1.md)
-- [Cierre Persona 2](docs/cierre_persona2.md)
-- [Recomendación corregida](docs/resultado_inversion.md)
 
 ## Ejecutar en otra computadora
 
