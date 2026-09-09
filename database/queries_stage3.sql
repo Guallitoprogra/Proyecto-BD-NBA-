@@ -284,3 +284,159 @@ JOIN top_scorer tsr
 JOIN team t
     ON t.team_id = ts.team_id
 ORDER BY star_dependency_pct DESC;
+-- ============================================================
+-- G. RANKING FINAL DE INVERSION
+-- Objetivo:
+-- Combinar rendimiento deportivo, eficiencia financiera
+-- y calidad del talento en un indice final de inversion.
+--
+-- Pesos:
+-- 33.33% rendimiento deportivo
+-- 33.33% eficiencia financiera
+-- 33.33% calidad del talento
+-- ============================================================
+
+WITH team_results AS (
+    SELECT
+        home_team_id AS team_id,
+        (home_win_loss = 'W')::int AS win
+    FROM game
+    WHERE season_start_year = 2020
+
+    UNION ALL
+
+    SELECT
+        away_team_id AS team_id,
+        (away_win_loss = 'W')::int AS win
+    FROM game
+    WHERE season_start_year = 2020
+),
+
+performance AS (
+    SELECT
+        team_id,
+        AVG(win::numeric) AS win_rate,
+        SUM(win) AS wins
+    FROM team_results
+    GROUP BY team_id
+),
+
+financial AS (
+    SELECT
+        p.team_id,
+        p.wins / NULLIF(ts.salary_2020_21 / 1000000.0, 0)
+            AS wins_per_million
+    FROM performance p
+    JOIN team t
+        ON t.team_id = p.team_id
+    JOIN team_salary ts
+        ON LOWER(TRIM(ts.team_name)) = LOWER(TRIM(t.full_name))
+    WHERE ts.salary_2020_21 IS NOT NULL
+),
+
+talent AS (
+    SELECT
+        team_id,
+        AVG(points)
+        + AVG(assists)
+        + AVG(rebounds) AS talent_score
+    FROM player_season_stat
+    WHERE season = '2021-22'
+      AND team_id <> 0
+    GROUP BY team_id
+),
+
+metrics AS (
+    SELECT
+        t.team_id,
+        t.full_name AS team_name,
+        p.win_rate,
+        f.wins_per_million,
+        ta.talent_score
+    FROM team t
+    JOIN performance p
+        ON p.team_id = t.team_id
+    JOIN financial f
+        ON f.team_id = t.team_id
+    JOIN talent ta
+        ON ta.team_id = t.team_id
+),
+
+normalized AS (
+    SELECT
+        *,
+        100 * (
+            win_rate - MIN(win_rate) OVER ()
+        ) / NULLIF(
+            MAX(win_rate) OVER () - MIN(win_rate) OVER (),
+            0
+        ) AS performance_score,
+
+        100 * (
+            wins_per_million - MIN(wins_per_million) OVER ()
+        ) / NULLIF(
+            MAX(wins_per_million) OVER ()
+            - MIN(wins_per_million) OVER (),
+            0
+        ) AS financial_score,
+
+        100 * (
+            talent_score - MIN(talent_score) OVER ()
+        ) / NULLIF(
+            MAX(talent_score) OVER ()
+            - MIN(talent_score) OVER (),
+            0
+        ) AS talent_score_normalized
+
+    FROM metrics
+),
+
+final_ranking AS (
+    SELECT
+        team_name,
+
+        ROUND(win_rate, 4) AS win_rate,
+
+        ROUND(wins_per_million, 4)
+            AS wins_per_million,
+
+        ROUND(talent_score, 2)
+            AS talent_score,
+
+        ROUND(performance_score, 2)
+            AS performance_score,
+
+        ROUND(financial_score, 2)
+            AS financial_score,
+
+        ROUND(talent_score_normalized, 2)
+            AS talent_score_normalized,
+
+        ROUND(
+            performance_score * 0.3333
+            + financial_score * 0.3333
+            + talent_score_normalized * 0.3334,
+            2
+        ) AS investment_score
+
+    FROM normalized
+)
+
+SELECT
+    ROW_NUMBER() OVER (
+        ORDER BY investment_score DESC
+    ) AS ranking,
+
+    team_name,
+    win_rate,
+    wins_per_million,
+    talent_score,
+    performance_score,
+    financial_score,
+    talent_score_normalized,
+    investment_score
+
+FROM final_ranking
+
+ORDER BY investment_score DESC
+LIMIT 5;
