@@ -40,3 +40,23 @@ FROM game_teams gt
 LEFT JOIN team_salary ts ON lower(ts.team_name) = lower(gt.team_name)
 WHERE ts.team_name IS NULL
 ORDER BY gt.team_name;
+
+-- Debe dar cero: resultados que no coinciden con el marcador.
+SELECT COUNT(*) AS invalid_results FROM game
+WHERE home_points IS NOT NULL AND away_points IS NOT NULL
+AND (home_points=away_points
+ OR home_win_loss IS DISTINCT FROM CASE WHEN home_points>away_points THEN 'W' ELSE 'L' END
+ OR away_win_loss IS DISTINCT FROM CASE WHEN away_points>home_points THEN 'W' ELSE 'L' END);
+
+-- Cobertura real por ID: no se descartan silenciosamente los del draft.
+SELECT d.player_id, d.player_name AS draft_player_without_2020_stats
+FROM draft_pick d WHERE draft_year=2018
+AND NOT EXISTS (SELECT 1 FROM player_season_stat p
+                WHERE p.player_id=d.player_id AND p.season='2020-21');
+
+SELECT COUNT(*) AS salary_teams, COUNT(t.team_id) AS matched_teams
+FROM team_salary s LEFT JOIN team t ON lower(s.team_name)=lower(t.full_name);
+
+SELECT player_name, games_played, points, assists, rebounds, plus_minus
+FROM player_season_stat WHERE season='2020-21'
+ORDER BY points DESC,player_id LIMIT 10;

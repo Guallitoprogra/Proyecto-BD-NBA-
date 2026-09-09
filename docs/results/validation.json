@@ -1,0 +1,247 @@
+[
+  [
+    {
+      "table_name": "draft_pick",
+      "rows": 7890
+    },
+    {
+      "table_name": "game",
+      "rows": 62379
+    },
+    {
+      "table_name": "game_official",
+      "rows": 65158
+    },
+    {
+      "table_name": "official",
+      "rows": 143
+    },
+    {
+      "table_name": "player",
+      "rows": 4501
+    },
+    {
+      "table_name": "player_attribute",
+      "rows": 4500
+    },
+    {
+      "table_name": "player_salary",
+      "rows": 1292
+    },
+    {
+      "table_name": "player_season_stat",
+      "rows": 1231
+    },
+    {
+      "table_name": "team",
+      "rows": 30
+    },
+    {
+      "table_name": "team_salary",
+      "rows": 30
+    }
+  ],
+  [
+    {
+      "games_without_complete_score": 0
+    }
+  ],
+  [
+    {
+      "season_start_year": 2015,
+      "games": 1230
+    },
+    {
+      "season_start_year": 2016,
+      "games": 1230
+    },
+    {
+      "season_start_year": 2017,
+      "games": 1230
+    },
+    {
+      "season_start_year": 2018,
+      "games": 1230
+    },
+    {
+      "season_start_year": 2019,
+      "games": 1059
+    },
+    {
+      "season_start_year": 2020,
+      "games": 1080
+    }
+  ],
+  [
+    {
+      "season": "2020-21",
+      "player_rows": 626,
+      "players": 540
+    },
+    {
+      "season": "2021-22",
+      "player_rows": 605,
+      "players": 605
+    }
+  ],
+  [
+    {
+      "unmatched_team_name": "LA Clippers"
+    }
+  ],
+  [
+    {
+      "invalid_results": 0
+    }
+  ],
+  [
+    {
+      "player_id": 1629016,
+      "draft_player_without_2020_stats": "Omari Spellman"
+    },
+    {
+      "player_id": 1629059,
+      "draft_player_without_2020_stats": "Elie Okobo"
+    },
+    {
+      "player_id": 1628980,
+      "draft_player_without_2020_stats": "Jacob Evans"
+    },
+    {
+      "player_id": 1628985,
+      "draft_player_without_2020_stats": "Devon Hall"
+    },
+    {
+      "player_id": 1628987,
+      "draft_player_without_2020_stats": "Kevin Hervey"
+    },
+    {
+      "player_id": 1629083,
+      "draft_player_without_2020_stats": "Arnoldas Kulboka"
+    },
+    {
+      "player_id": 1629068,
+      "draft_player_without_2020_stats": "Issuf Sanon"
+    },
+    {
+      "player_id": 1628974,
+      "draft_player_without_2020_stats": "Tony Carr"
+    },
+    {
+      "player_id": 1629118,
+      "draft_player_without_2020_stats": "Thomas Welsh"
+    },
+    {
+      "player_id": 1628982,
+      "draft_player_without_2020_stats": "Melvin Frazier Jr."
+    },
+    {
+      "player_id": 1629015,
+      "draft_player_without_2020_stats": "Zhaire Smith"
+    },
+    {
+      "player_id": 1628992,
+      "draft_player_without_2020_stats": "Justin Jackson"
+    },
+    {
+      "player_id": 1628994,
+      "draft_player_without_2020_stats": "George King"
+    },
+    {
+      "player_id": 1629058,
+      "draft_player_without_2020_stats": "Dzanan Musa"
+    },
+    {
+      "player_id": 1629053,
+      "draft_player_without_2020_stats": "Vincent Edwards"
+    }
+  ],
+  [
+    {
+      "salary_teams": 30,
+      "matched_teams": 30
+    }
+  ],
+  [
+    {
+      "player_name": "Stephen Curry",
+      "games_played": 63,
+      "points": 32.0,
+      "assists": 5.8,
+      "rebounds": 5.5,
+      "plus_minus": 3.9
+    },
+    {
+      "player_name": "Bradley Beal",
+      "games_played": 60,
+      "points": 31.3,
+      "assists": 4.4,
+      "rebounds": 4.7,
+      "plus_minus": -0.1
+    },
+    {
+      "player_name": "Damian Lillard",
+      "games_played": 67,
+      "points": 28.8,
+      "assists": 7.5,
+      "rebounds": 4.2,
+      "plus_minus": 3.0
+    },
+    {
+      "player_name": "Joel Embiid",
+      "games_played": 51,
+      "points": 28.5,
+      "assists": 2.8,
+      "rebounds": 10.6,
+      "plus_minus": 7.9
+    },
+    {
+      "player_name": "Giannis Antetokounmpo",
+      "games_played": 61,
+      "points": 28.1,
+      "assists": 5.9,
+      "rebounds": 11.0,
+      "plus_minus": 6.7
+    },
+    {
+      "player_name": "Luka Dončić",
+      "games_played": 66,
+      "points": 27.7,
+      "assists": 8.6,
+      "rebounds": 8.0,
+      "plus_minus": 2.5
+    },
+    {
+      "player_name": "Zach LaVine",
+      "games_played": 58,
+      "points": 27.4,
+      "assists": 4.9,
+      "rebounds": 5.0,
+      "plus_minus": -0.2
+    },
+    {
+      "player_name": "Zion Williamson",
+      "games_played": 61,
+      "points": 27.0,
+      "assists": 3.7,
+      "rebounds": 7.2,
+      "plus_minus": 1.5
+    },
+    {
+      "player_name": "Kevin Durant",
+      "games_played": 35,
+      "points": 26.9,
+      "assists": 5.6,
+      "rebounds": 7.1,
+      "plus_minus": 8.0
+    },
+    {
+      "player_name": "Kyrie Irving",
+      "games_played": 54,
+      "points": 26.9,
+      "assists": 6.0,
+      "rebounds": 4.8,
+      "plus_minus": 4.2
+    }
+  ]
+]

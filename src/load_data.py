@@ -155,11 +155,18 @@ def load_games(conn, archive):
         away_team_name=EXCLUDED.away_team_name, away_win_loss=EXCLUDED.away_win_loss,
         away_points=EXCLUDED.away_points, attendance=EXCLUDED.attendance"""
     def transform(r):
+        home_points = as_int(r["PTS_HOME"])
+        away_points = as_int(r["PTS_AWAY"])
+        home_result = blank_to_none(r["WL_HOME"])
+        away_result = blank_to_none(r["WL_AWAY"])
+        if home_points is not None and away_points is not None and home_points != away_points:
+            home_result = "W" if home_points > away_points else "L"
+            away_result = "L" if home_points > away_points else "W"
         return (r["GAME_ID"], blank_to_none(r["SEASON_ID"]), as_int(r["SEASON"]),
                 r["GAME_DATE"][:10], as_int(r["TEAM_ID_HOME"]),
-                blank_to_none(r["TEAM_NAME_HOME"]), blank_to_none(r["WL_HOME"]),
+                blank_to_none(r["TEAM_NAME_HOME"]), home_result,
                 as_int(r["PTS_HOME"]), as_int(r["TEAM_ID_AWAY"]),
-                blank_to_none(r["TEAM_NAME_AWAY"]), blank_to_none(r["WL_AWAY"]),
+                blank_to_none(r["TEAM_NAME_AWAY"]), away_result,
                 as_int(r["PTS_AWAY"]), as_int(r["ATTENDANCE"]))
     return execute_batches(conn, sql, map(transform, rows_from_zip(archive, "Game.csv")))
 
@@ -218,7 +225,7 @@ def load_draft(conn, archive):
         (draft_year,overall_pick,round_number,round_pick,player_id,player_name,
          team_id,team_name,organization_from)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        ON CONFLICT (draft_year,overall_pick) DO UPDATE SET
+        ON CONFLICT (draft_year,overall_pick,player_name) DO UPDATE SET
         round_number=EXCLUDED.round_number, round_pick=EXCLUDED.round_pick,
         player_id=EXCLUDED.player_id, player_name=EXCLUDED.player_name,
         team_id=EXCLUDED.team_id, team_name=EXCLUDED.team_name,
@@ -233,7 +240,7 @@ def load_draft(conn, archive):
 
 
 def main() -> int:
-    load_dotenv(ROOT / ".env")
+    load_dotenv(os.getenv('PROJECT_ENV_FILE', str(ROOT / '.env')))
     zip_path = Path(os.environ.get("DATA_ZIP", ""))
     if not zip_path.is_file():
         print(f"ERROR: DATA_ZIP no apunta a un archivo válido: {zip_path}", file=sys.stderr)
@@ -242,7 +249,7 @@ def main() -> int:
     connection_kwargs = {
         "host": os.getenv("DB_HOST", "localhost"),
         "port": os.getenv("DB_PORT", "5432"),
-        "dbname": os.getenv("DB_NAME", "nba_investment"),
+        "dbname": os.getenv("DB_NAME", "nba_project"),
         "user": os.getenv("DB_USER", "postgres"),
         "password": os.getenv("DB_PASSWORD", ""),
     }

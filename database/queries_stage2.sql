@@ -60,46 +60,24 @@ GROUP BY o.official_id, o.first_name, o.last_name
 ORDER BY away_losses DESC, official_name
 LIMIT 5;
 
--- 4. ¿Qué equipos manejan los salarios más altos en la última
--- temporada disponible y cómo se compara con su jugador mejor pagado?
-
-WITH latest_season AS (
-    SELECT MAX(season) AS season
-    FROM player_salary
-),
-highest_player_salary AS (
-    SELECT
-        ps.team_name,
-        MAX(ps.salary_value) AS highest_player_salary
-    FROM player_salary ps
-    JOIN latest_season ls
-        ON ps.season = ls.season
-    GROUP BY ps.team_name
+-- 4. Nómina y valor deportivo en 2020-21, última temporada previa a invertir.
+-- Valor = PTS + AST + REB por partido; mínimo 20 juegos.
+-- No confundimos salario con rendimiento. La correlación describe asociación.
+WITH talent AS (
+    SELECT team_id, MAX(points + assists + rebounds) AS best_player_value
+    FROM player_season_stat WHERE season='2020-21' AND games_played >= 20
+    GROUP BY team_id
+), comparison AS (
+    SELECT t.full_name AS team_name, ts.salary_2020_21 AS payroll,
+           ta.best_player_value
+    FROM team t JOIN team_salary ts ON lower(t.full_name)=lower(ts.team_name)
+    LEFT JOIN talent ta ON ta.team_id=t.team_id
 )
-
-SELECT
-    ls.season,
-    ts.team_name,
-
-    CASE ls.season
-        WHEN '2020-21' THEN ts.salary_2020_21
-        WHEN '2021-22' THEN ts.salary_2021_22
-        WHEN '2022-23' THEN ts.salary_2022_23
-        WHEN '2023-24' THEN ts.salary_2023_24
-        WHEN '2024-25' THEN ts.salary_2024_25
-        WHEN '2025-26' THEN ts.salary_2025_26
-    END AS total_team_salary,
-
-    hps.highest_player_salary
-
-FROM team_salary ts
-CROSS JOIN latest_season ls
-
-LEFT JOIN highest_player_salary hps
-    ON LOWER(TRIM(hps.team_name))
-     = LOWER(TRIM(ts.team_name))
-
-ORDER BY total_team_salary DESC NULLS LAST;
+SELECT *, RANK() OVER (ORDER BY payroll DESC) AS payroll_rank,
+       RANK() OVER (ORDER BY best_player_value DESC NULLS LAST) AS talent_rank,
+       (SELECT corr(payroll::float, best_player_value::float) FROM comparison)
+           AS salary_talent_correlation
+FROM comparison ORDER BY payroll DESC;
 
 -- 5A. Temporada(s) con mayor cantidad de partidos.
 
@@ -156,47 +134,23 @@ FROM ranked
 WHERE position = 1
 ORDER BY season_start_year;
 
--- 7. Jugador del Draft 2018 con mayor salario
--- usando la temporada más reciente disponible para cada jugador.
-
-WITH draft_2018_salaries AS (
-    SELECT
-        d.player_name,
-        d.overall_pick,
-        d.team_name AS draft_team,
-        ps.team_name AS salary_team,
-        ps.season,
-        ps.salary_value,
-
-        ROW_NUMBER() OVER (
-            PARTITION BY d.player_name
-            ORDER BY ps.season DESC
-        ) AS rn
-
-    FROM draft_pick d
-
-    JOIN player_salary ps
-        ON LOWER(TRIM(d.player_name))
-         = LOWER(TRIM(ps.player_name))
-
-    WHERE d.draft_year = 2018
+-- 7. Valor deportivo del draft 2018 en la misma temporada 2020-21.
+-- Se enlaza por ID y se muestran empates. 20 juegos evitan muestras mínimas.
+WITH candidates AS (
+    SELECT p.player_id, MAX(p.player_name) AS player_name, SUM(p.games_played) AS games_played,
+           ROUND(SUM(p.points*p.games_played)/SUM(p.games_played),2) AS points,
+           ROUND(SUM(p.assists*p.games_played)/SUM(p.games_played),2) AS assists,
+           ROUND(SUM(p.rebounds*p.games_played)/SUM(p.games_played),2) AS rebounds,
+           ROUND(SUM((p.points+p.assists+p.rebounds)*p.games_played)/SUM(p.games_played),2) AS player_value
+    FROM player_season_stat p
+    WHERE p.season='2020-21' AND p.games_played>0
+      AND EXISTS (SELECT 1 FROM draft_pick d
+                  WHERE d.player_id=p.player_id AND d.draft_year=2018)
+    GROUP BY p.player_id HAVING SUM(p.games_played)>=20
 )
-
-SELECT
-    player_name,
-    overall_pick,
-    draft_team,
-    salary_team,
-    season,
-    salary_value
-
-FROM draft_2018_salaries
-
-WHERE rn = 1
-
-ORDER BY salary_value DESC
-
-LIMIT 1;
+SELECT * FROM candidates
+WHERE player_value=(SELECT MAX(player_value) FROM candidates)
+ORDER BY player_id;
 
 -- 8. Top 5 de estados con mayor gasto salarial
 -- en 2020-21 y 2021-22.

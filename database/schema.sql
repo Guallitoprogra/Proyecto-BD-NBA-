@@ -117,8 +117,13 @@ CREATE TABLE IF NOT EXISTS draft_pick (
     team_id             BIGINT,
     team_name           TEXT,
     organization_from   TEXT,
-    PRIMARY KEY (draft_year, overall_pick)
+    PRIMARY KEY (draft_year, overall_pick, player_name)
 );
+
+-- Las selecciones históricas con número 0 no identifican a un solo jugador.
+-- También actualiza las bases que usaban la llave anterior, sin borrar filas.
+ALTER TABLE draft_pick DROP CONSTRAINT IF EXISTS draft_pick_pkey;
+ALTER TABLE draft_pick ADD PRIMARY KEY (draft_year, overall_pick, player_name);
 
 COMMIT;
 

@@ -18,6 +18,9 @@ Este archivo debe actualizarse durante todo el proyecto. Cada decisión debe ten
 
 ## Plantilla para nuevos hallazgos
 
+La revisión del 8 de septiembre está en `cierre_persona1.md`. Sustituye las decisiones
+iniciales sobre la llave del draft, W/L, altura y temporada de comparación.
+
 ```text
 Fecha:
 Archivo/tabla:

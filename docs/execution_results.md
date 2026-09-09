@@ -1,5 +1,8 @@
 # Resultados de ejecución - Persona 1
 
+> Registro de la primera prueba. Para los resultados corregidos del 8 de septiembre,
+> consultar `cierre_persona1.md` y `results/`. Los conteos y conclusiones de abajo son históricos.
+
 Fecha de validación: 7 de septiembre de 2026.
 
 ## Base de datos
